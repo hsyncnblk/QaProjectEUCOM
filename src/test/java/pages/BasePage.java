@@ -47,22 +47,32 @@ public abstract class BasePage {
     protected void waitForVisibilityOfElements(List<WebElement> elements) {
         wait.until(ExpectedConditions.visibilityOfAllElements(elements));
     }
-    // Element görünür olana kadar bekleyen metod
     protected void waitForVisibility(WebElement element) {
         wait.until(ExpectedConditions.visibilityOf(element));
     }
     protected void waitForTextToBePresentInElement(WebElement element) {
-        // wait nesnesi zaten constructor'da tanımlı, onu kullanıyoruz
         wait.until(driver -> {
             String text = element.getText();
             return text != null && !text.isEmpty();
         });
 
     }
+    protected void scrollToElement(WebElement element) {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].scrollIntoView({block: 'center', behavior: 'smooth'});", element);
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+    }
+    protected void scrollToTop() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollTo(0, 0);");
+    }
+    protected void scrollUp(int pixels) {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollBy(0, -" + pixels + ");");
+    }
 
     protected String getValueByJS(String cssSelector) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        // JS kodunu buraya hapsettik, dışarıdan sadece selector gönderiyoruz
         String query = "var el = document.querySelector('" + cssSelector + "'); " +
                 "if(!el) return 'ELEMENT_YOK'; " +
                 "var text = el.textContent; " +

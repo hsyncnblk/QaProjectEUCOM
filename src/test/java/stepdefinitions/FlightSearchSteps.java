@@ -12,8 +12,8 @@ import java.util.List;
 
 public class FlightSearchSteps {
 
-    HomePage homePage = new HomePage();
-    FlightListingPage listingPage = new FlightListingPage();
+    private final HomePage homePage = new HomePage();
+    private final FlightListingPage listingPage = new FlightListingPage();
 
     @Given("the user navigates to the Enuygun homepage")
     public void the_user_navigates_to_the_enuygun_homepage() {
@@ -63,5 +63,33 @@ public class FlightSearchSteps {
 
         Assert.assertTrue("HATA! Sayfa metni varış şehrini içermiyor. Mevcut: " + cleanActualText,
                 cleanActualText.contains(expectedArr));
+    }
+    // CASE 2
+    @And("the user selects {string} from the airline filters")
+    public void the_user_selects_from_the_airline_filters(String airlineName) {
+        listingPage.selectAirlineByName(airlineName);
+        System.out.println("Havayolu filtresi uygulandı: " + airlineName);
+    }
+
+    @Then("verify that all displayed flights are {string} flights")
+    public void verify_that_all_displayed_flights_are_flights(String expectedAirline) {
+        List<String> actualAirlines = listingPage.getAllAirlineNames();
+        System.out.println("Kontrol edilen bilet sayısı: " + actualAirlines.size());
+
+        for (String airline : actualAirlines) {
+            Assert.assertTrue("HATA! Listede farklı bir havayolu var: " + airline,
+                    airline.contains(expectedAirline) || airline.contains("AJet") || airline.contains("AnadoluJet"));
+        }
+    }
+
+    @And("verify that flight prices are sorted in ascending order")
+    public void verify_that_flight_prices_are_sorted_in_ascending_order() {
+        List<Double> prices = listingPage.getAllFlightPrices();
+
+        for (int i = 0; i < prices.size() - 1; i++) {
+            Assert.assertTrue("HATA! Fiyatlar sıralı değil. " + prices.get(i) + " > " + prices.get(i+1),
+                    prices.get(i) <= prices.get(i+1));
+        }
+        System.out.println("Fiyatların küçükten büyüğe sıralandığı doğrulandı!");
     }
 }

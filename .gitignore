@@ -38,3 +38,10 @@ build/
 .DS_Store
 
 src/test/resources/config.properties
+
+target/
+.idea/
+*.iml
+.allure/
+allure-results/
+out/

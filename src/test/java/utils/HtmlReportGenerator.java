@@ -12,7 +12,6 @@ public class HtmlReportGenerator {
     public static void generateReport(List<FlightData> flights, String filePath) {
         if (flights.isEmpty()) return;
 
-        // 1. Havayolu bazında Min/Max/Avg verilerini hazırla
         Map<String, DoubleSummaryStatistics> stats = flights.stream()
                 .collect(Collectors.groupingBy(FlightData::getAirline,
                         Collectors.summarizingDouble(FlightData::getPrice)));
@@ -29,16 +28,13 @@ public class HtmlReportGenerator {
             avgData.append(entry.getValue().getAverage()).append(",");
         }
 
-        // 2. Heatmap (Saat/Fiyat Dağılımı) için verileri hazırla
         StringBuilder scatterData = new StringBuilder();
         for (FlightData f : flights) {
-            // Saati (Örn: 15:05) ondalık sayıya çevir (15.08) grafikte göstermek için
             String[] timeParts = f.getDepartureTime().split(":");
             double timeValue = Double.parseDouble(timeParts[0]) + (Double.parseDouble(timeParts[1]) / 60.0);
             scatterData.append("{x: ").append(timeValue).append(", y: ").append(f.getPrice()).append("},");
         }
 
-        // 3. HTML ve Chart.js Kodunu İnşa Et
         String htmlContent = "<!DOCTYPE html>\n<html lang='tr'>\n<head>\n" +
                 "    <meta charset='UTF-8'>\n" +
                 "    <title>Uçuş Veri Analiz Raporu</title>\n" +
@@ -94,7 +90,6 @@ public class HtmlReportGenerator {
                 "</script>\n" +
                 "</body>\n</html>";
 
-        // HTML'i dosyaya yaz
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(htmlContent);
             System.out.println("Başarılı: Görsel HTML Raporu oluşturuldu -> " + filePath);

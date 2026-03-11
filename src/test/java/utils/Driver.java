@@ -25,6 +25,8 @@ public class Driver {
                     ChromeOptions chromeOptions = new ChromeOptions();
                     chromeOptions.addArguments("--disable-notifications");
                     chromeOptions.addArguments("--start-maximized");
+                    chromeOptions.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+                    chromeOptions.setExperimentalOption("useAutomationExtension", false);
                     driverPool.set(new ChromeDriver(chromeOptions));
                     break;
                 case "firefox":

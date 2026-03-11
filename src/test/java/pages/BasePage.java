@@ -77,7 +77,7 @@ public abstract class BasePage {
         }
     }
 
-    protected void switchToNewTab() {
+    public void switchToNewTab() {
         System.out.println("Yeni sekme kontrolü yapılıyor...");
         waitBySecond(3);
 

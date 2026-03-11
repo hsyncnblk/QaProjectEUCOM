@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
         },
         features = "src/test/resources/features",
         glue = "stepdefinitions",
-        tags = "@CriticalPath",
+        tags = "@AnalysisPath",
         dryRun = false
 )
 public class TestRunner {

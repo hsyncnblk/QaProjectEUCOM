@@ -1,9 +1,6 @@
 package pages;
 
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -12,6 +9,7 @@ import utils.Driver;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 public abstract class BasePage {
     protected WebDriver driver;
@@ -71,6 +69,37 @@ public abstract class BasePage {
         js.executeScript("window.scrollBy(0, -" + pixels + ");");
     }
 
+    protected void waitBySecond(int second) {
+        try {
+            Thread.sleep(second * 1000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    protected void switchToNewTab() {
+        System.out.println("Yeni sekme kontrolü yapılıyor...");
+        waitBySecond(3);
+
+        String currentWindow = driver.getWindowHandle();
+        Set<String> allWindows = driver.getWindowHandles();
+
+        for (String window : allWindows) {
+            if (!window.equals(currentWindow)) {
+                driver.switchTo().window(window);
+                System.out.println("Yeni sekmeye geçildi! URL: " + driver.getCurrentUrl());
+                break; // Yeni sekmeyi bulur bulmaz döngüden çık
+            }
+        }
+    }
+
+    protected void jsClick(By locator) {
+        WebElement element = driver.findElement(locator);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
+    protected void jsClick(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
     protected String getValueByJS(String cssSelector) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         String query = "var el = document.querySelector('" + cssSelector + "'); " +

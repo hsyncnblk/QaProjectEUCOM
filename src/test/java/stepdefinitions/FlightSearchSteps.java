@@ -51,7 +51,6 @@ public class FlightSearchSteps {
         Assert.assertTrue("HATA! Varış şehri eksik: " + expectedArr, cleanActualText.contains(expectedArr));
     }
 
-    // --- CASE 2 ---
     @And("the user selects {string} from the airline filters")
     public void the_user_selects_from_the_airline_filters(String airlineName) {
         listingPage.selectAirlineByName(airlineName);
@@ -74,4 +73,9 @@ public class FlightSearchSteps {
                     prices.get(i) <= prices.get(i+1));
         }
     }
+    @And("the user selects the first available flight")
+    public void the_user_selects_the_first_available_flight() {
+        listingPage.selectFirstFlight();
+    }
+
 }

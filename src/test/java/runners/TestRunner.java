@@ -9,11 +9,11 @@ import org.junit.runner.RunWith;
         plugin = {
                 "pretty",
                 "html:target/cucumber-reports.html",
-                "json:target/json-reports/cucumber.json"
+                "json:target/json-reports/cucumber.json",
+                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
         },
         features = "src/test/resources/features",
         glue = "stepdefinitions",
-        tags = "@AnalysisPath",
         dryRun = false
 )
 public class TestRunner {

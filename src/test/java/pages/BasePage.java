@@ -39,47 +39,47 @@ public abstract class BasePage {
 
     protected void waitForVisibilityOfElement(WebElement element) {
         wait.until(ExpectedConditions.visibilityOf(element));
-
     }
 
     protected void waitForVisibilityOfElements(List<WebElement> elements) {
         wait.until(ExpectedConditions.visibilityOfAllElements(elements));
     }
-    protected void waitForVisibility(WebElement element) {
-        wait.until(ExpectedConditions.visibilityOf(element));
-    }
+
     protected void waitForTextToBePresentInElement(WebElement element) {
         wait.until(driver -> {
             String text = element.getText();
             return text != null && !text.isEmpty();
         });
-
     }
+
     protected void scrollToElement(WebElement element) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView({block: 'center', behavior: 'smooth'});", element);
         wait.until(ExpectedConditions.elementToBeClickable(element));
     }
+
     protected void scrollToTop() {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollTo(0, 0);");
     }
+
     protected void scrollUp(int pixels) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.scrollBy(0, -" + pixels + ");");
     }
 
-    protected void waitBySecond(int second) {
-        try {
-            Thread.sleep(second * 1000L);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    protected void waitForElementToBeClickable(WebElement element) {
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+    }
+
+    protected void waitForElementToBeVisible(WebElement element) {
+        wait.until(ExpectedConditions.visibilityOf(element));
     }
 
     public void switchToNewTab() {
         System.out.println("Yeni sekme kontrolü yapılıyor...");
-        waitBySecond(3);
+
+        wait.until(driver -> driver.getWindowHandles().size() > 1);
 
         String currentWindow = driver.getWindowHandle();
         Set<String> allWindows = driver.getWindowHandles();
@@ -88,7 +88,7 @@ public abstract class BasePage {
             if (!window.equals(currentWindow)) {
                 driver.switchTo().window(window);
                 System.out.println("Yeni sekmeye geçildi! URL: " + driver.getCurrentUrl());
-                break; // Yeni sekmeyi bulur bulmaz döngüden çık
+                break;
             }
         }
     }
@@ -97,9 +97,11 @@ public abstract class BasePage {
         WebElement element = driver.findElement(locator);
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
+
     protected void jsClick(WebElement element) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
     }
+
     protected String getValueByJS(String cssSelector) {
         JavascriptExecutor js = (JavascriptExecutor) driver;
         String query = "var el = document.querySelector('" + cssSelector + "'); " +

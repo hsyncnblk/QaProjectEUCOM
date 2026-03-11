@@ -8,11 +8,14 @@ import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import pages.FlightListingPage;
 import pages.HomePage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.List;
 import java.util.Locale;
 
 public class FlightSearchSteps {
-
+    private static final Logger logger = LogManager.getLogger(FlightSearchSteps.class);
     private final HomePage homePage = new HomePage();
     private final FlightListingPage listingPage = new FlightListingPage();
     private final Locale TR_LOCALE = new Locale("tr", "TR");
@@ -32,12 +35,15 @@ public class FlightSearchSteps {
         listingPage.filterDepartureTime(timeFilter);
     }
 
-    @Then("verify that all displayed flights have departure times within the specified range")
-    public void verify_that_all_displayed_flights_have_departure_times_within_the_specified_range() {
+    @Then("verify that all displayed flights have departure times within {int} and {int}")
+    public void verify_that_all_displayed_flights_have_departure_times_within_range(int startHour, int endHour) {
+        logger.info("Verifying flight hours are between " + startHour + " and " + endHour);
         List<WebElement> times = listingPage.getAllDepartureTimes();
+
         for (WebElement timeElement : times) {
             int hour = Integer.parseInt(timeElement.getText().split(":")[0]);
-            Assert.assertTrue("HATA! Uçuş saati " + hour + " aralık dışında!", hour >= 10 && hour <= 18);
+            Assert.assertTrue("FAILED: Flight time " + hour + " is out of the [" + startHour + "-" + endHour + "] range!",
+                    hour >= startHour && hour <= endHour);
         }
     }
 
@@ -47,8 +53,8 @@ public class FlightSearchSteps {
         String expectedDep = departure.toLowerCase(TR_LOCALE).trim();
         String expectedArr = arrival.toLowerCase(TR_LOCALE).trim();
 
-        Assert.assertTrue("HATA! Kalkış şehri eksik: " + expectedDep, cleanActualText.contains(expectedDep));
-        Assert.assertTrue("HATA! Varış şehri eksik: " + expectedArr, cleanActualText.contains(expectedArr));
+        Assert.assertTrue("FAILED: Departure city mismatch. Expected: " + expectedDep, cleanActualText.contains(expectedDep));
+        Assert.assertTrue("FAILED: Arrival city mismatch. Expected: " + expectedArr, cleanActualText.contains(expectedArr));
     }
 
     @And("the user selects {string} from the airline filters")
@@ -60,7 +66,7 @@ public class FlightSearchSteps {
     public void verify_that_all_displayed_flights_are_flights(String expectedAirline) {
         List<String> actualAirlines = listingPage.getAllAirlineNames();
         for (String airline : actualAirlines) {
-            Assert.assertTrue("Farklı havayolu bulundu: " + airline,
+            Assert.assertTrue("FAILED: Found different airline: " + airline,
                     airline.contains(expectedAirline) || airline.contains("AJet") || airline.contains("AnadoluJet"));
         }
     }
@@ -69,13 +75,13 @@ public class FlightSearchSteps {
     public void verify_that_flight_prices_are_sorted_in_ascending_order() {
         List<Double> prices = listingPage.getAllFlightPrices();
         for (int i = 0; i < prices.size() - 1; i++) {
-            Assert.assertTrue("Sıralama hatası: " + prices.get(i) + " > " + prices.get(i+1),
+            Assert.assertTrue("FAILED: Prices are not ascending: " + prices.get(i) + " > " + prices.get(i+1),
                     prices.get(i) <= prices.get(i+1));
         }
     }
+
     @And("the user selects the first available flight")
     public void the_user_selects_the_first_available_flight() {
         listingPage.selectFirstFlight();
     }
-
 }

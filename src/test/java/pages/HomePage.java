@@ -75,6 +75,8 @@ public class HomePage extends BasePage {
         selectDateFromCalendar(returnDate);
 
         clickElement(searchButton);
+
+        switchToNewTab();
     }
     private void selectDateFromCalendar(String date) {
         String dynamicXpath = "//button[@title='" + date + "']";

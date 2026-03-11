@@ -5,7 +5,7 @@ Feature: Flight Search and Time Filtering Validation
     Given the user navigates to the Enuygun homepage
     When the user searches for a round-trip flight from "<departure_city>" to "<arrival_city>" departing on "<departure_date>" and returning on "<return_date>"
     And the user applies the departure time filter "<timeRange>" on the flight listing page
-    Then verify that all displayed flights have departure times within the specified range
+    Then verify that all displayed flights have departure times within 10 and 18
     And verify the search results match the selected route "<departure_city>" to "<arrival_city>"
 
     Examples:

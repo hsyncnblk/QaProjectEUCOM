@@ -5,8 +5,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class PassengerInfoPage extends BasePage {
+    private static final Logger logger = LogManager.getLogger(PassengerInfoPage.class);
 
     @FindBy(id = "contact_email")
     private WebElement emailInput;
@@ -32,19 +35,17 @@ public class PassengerInfoPage extends BasePage {
     @FindBy(xpath = "//select[@name='birthDateYear_0']")
     private WebElement birthYearSelect;
 
-    // Radyo butonlarında <input> yerine <label> elementine tıklamak native click için çok daha güvenlidir
     @FindBy(xpath = "//label[contains(@class, 'gender-male') or contains(., 'Erkek')]")
     private WebElement maleGenderLabel;
 
-    @FindBy(id = "priceInfoGrandTotal")
-    private WebElement grandTotalPriceElement;
     @FindBy(id = "continue-button")
     private WebElement proceedToPaymentButton;
 
-    @FindBy(xpath = "//span[normalize-space()='Ödeme yap']")
-    private WebElement paySubmitButton;
+    private final By payButtonLocator = By.cssSelector("button[data-testid='payment-form-submit-button']");
 
     public void fillPassengerForm(String email, String phone, String fname, String lname, String tc) {
+        logger.info("Filling passenger information form...");
+        waitForVisibilityOfElement(emailInput);
         sendKeysToElement(emailInput, email);
         sendKeysToElement(phoneInput, phone);
         sendKeysToElement(firstNameInput, fname);
@@ -59,21 +60,18 @@ public class PassengerInfoPage extends BasePage {
     }
 
     public void clickContinue() {
+        logger.info("Proceeding to payment page...");
         scrollToElement(proceedToPaymentButton);
+        waitForElementToBeClickable(proceedToPaymentButton);
         clickElement(proceedToPaymentButton);
     }
+
     public boolean isPayButtonVisible() {
         try {
-            waitBySecond(8);
-
-            By payButtonLocator = By.cssSelector("button[data-testid='payment-form-submit-button']");
-
-            WebElement button = wait.until(ExpectedConditions.presenceOfElementLocated(payButtonLocator));
-
-            return button != null;
-
+            WebElement button = wait.until(ExpectedConditions.visibilityOfElementLocated(payButtonLocator));
+            return button.isDisplayed();
         } catch (Exception e) {
-            System.out.println("HATA: 'Ödeme yap' butonu 8 saniye içinde ekrana gelmedi.");
+            logger.error("Payment button did not become visible within the timeout period.");
             return false;
         }
     }

@@ -5,11 +5,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
-import java.util.Set;
 
 public class FlightListingPage extends BasePage {
+    private static final Logger logger = LogManager.getLogger(FlightListingPage.class);
 
     @FindBy(xpath = "//div[contains(@class, 'ctx-filter-departure-return-time')]")
     private WebElement departureTimeFilterMenu;
@@ -47,19 +49,13 @@ public class FlightListingPage extends BasePage {
     @FindBy(xpath = "(//div[starts-with(@data-testid, 'returnProviderPackageItem')])[1]")
     private WebElement donusPaketKarti;
 
-
-    private final By returnSelectButton = By.xpath("(//div[contains(@class, 'flight-list-return')]//button[contains(@class, 'action-select-btn')])[1]");
-    private final By returnPackageCard = By.xpath("(//div[starts-with(@data-testid, 'returnProviderPackageItem')])[1]");
-
-    private final By activeFlightSelectButton = By.cssSelector("#flight-0 .action-select-btn");
-    private final By departurePackageButton = By.xpath("(//button[contains(., 'Seç ve İlerle')])[1]");
-    private final By returnPackageCardz = By.xpath("(//i[@class='ei-chevron-right chevron-alternate'])[121]");
-
     public String getActualRoute() {
         return getValueByJS(".info strong");
     }
 
     public void filterDepartureTime(String timeRange) {
+        logger.info("Applying time filter: " + timeRange);
+        waitForElementToBeClickable(departureTimeFilterMenu);
         clickElement(departureTimeFilterMenu);
         clickElement(departureNoonFilterButton);
 
@@ -74,11 +70,13 @@ public class FlightListingPage extends BasePage {
     }
 
     public List<WebElement> getAllDepartureTimes() {
+        waitForVisibilityOfElements(departureTimesList);
         return departureTimesList;
     }
 
     public void selectAirlineByName(String airlineName) {
         try {
+            logger.info("Selecting airline: " + airlineName);
             String dynamicXpath = "//label[contains(.,'" + airlineName + "')]";
             scrollToElement(airlinesFilterHeader);
 
@@ -95,8 +93,8 @@ public class FlightListingPage extends BasePage {
 
             wait.until(ExpectedConditions.stalenessOf(oldFirstTicket));
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//div[contains(@class, 'summary-marketing-airlines')])[1]")));
-
         } catch (Exception e) {
+            logger.error("Failed to select airline: " + airlineName, e);
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -110,26 +108,19 @@ public class FlightListingPage extends BasePage {
     }
 
     public void selectFirstFlight() {
-        waitBySecond(4);
+        logger.info("Selecting the first available flight and returning package.");
+       // switchToNewTab();
 
-        String currentWindow = driver.getWindowHandle();
-        Set<String> allWindows = driver.getWindowHandles();
-        for (String window : allWindows) {
-            if (!window.equals(currentWindow)) {
-                driver.switchTo().window(window);
-            }
-        }
-        waitBySecond(4);
-
+        waitForElementToBeClickable(gidisSecButonu);
         jsClick(gidisSecButonu);
 
+        waitForElementToBeClickable(paketSecButonu);
         jsClick(paketSecButonu);
 
-        waitBySecond(4);
+        waitForElementToBeClickable(donusBtn);
         jsClick(donusBtn);
-        waitBySecond(4);
 
+        waitForElementToBeClickable(donusPaketKarti);
         jsClick(donusPaketKarti);
     }
-
 }

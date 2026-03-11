@@ -4,10 +4,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.List;
 
 public class FlightListingPage extends BasePage {
-
 
     @FindBy(xpath = "//div[contains(@class, 'ctx-filter-departure-return-time')]")
     private WebElement departureTimeFilterMenu;
@@ -24,8 +24,6 @@ public class FlightListingPage extends BasePage {
     @FindBy(xpath = "//div[@data-testid='departureTime']")
     private List<WebElement> departureTimesList;
 
-
-    // CASE 2:
     @FindBy(xpath = "//div[contains(@class, 'ctx-filter-airline') and contains(@class, 'card-header')]")
     private WebElement airlinesFilterHeader;
 
@@ -35,21 +33,27 @@ public class FlightListingPage extends BasePage {
     @FindBy(xpath = "//div[@data-testid='flightInfoPrice']")
     private List<WebElement> flightPrices;
 
-    public String getActualRoute() {
+    @FindBy(xpath = "(//button[contains(@class, 'select-flight-button')])[1]")
+    private WebElement firstFlightSelectButton;
 
+
+    public String getActualRoute() {
         return getValueByJS(".info strong");
     }
 
-    public void filterDepartureTimeUntil18() {
-        clickElement(departureTimeFilterMenu);
+    public void filterDepartureTime(String timeRange) {
+            clickElement(departureTimeFilterMenu);
+
 
         clickElement(departureNoonFilterButton);
+
+        String targetTime = timeRange.split("-")[1].trim();
 
         Actions actions = new Actions(driver);
         int attempts = 0;
 
-        while (!sliderTimeText.getText().contains("18:00") && attempts < 15) {
-            actions.dragAndDropBy(rightSliderHandle, 8, 0).build().perform();
+        while (!sliderTimeText.getText().contains(targetTime) && attempts < 25) {
+            actions.dragAndDropBy(rightSliderHandle, 10, 0).build().perform();
             attempts++;
         }
     }
@@ -58,42 +62,43 @@ public class FlightListingPage extends BasePage {
         return departureTimesList;
     }
 
-    //Case 2
+
     public void selectAirlineByName(String airlineName) {
         try {
             String dynamicXpath = "//label[contains(.,'" + airlineName + "')]";
             scrollToElement(airlinesFilterHeader);
 
-            java.util.List<org.openqa.selenium.WebElement> checkboxes = driver.findElements(org.openqa.selenium.By.xpath(dynamicXpath));
+            List<WebElement> checkboxes = driver.findElements(By.xpath(dynamicXpath));
             if (checkboxes.isEmpty() || !checkboxes.get(0).isDisplayed()) {
                 clickElement(airlinesFilterHeader);
             }
 
-            org.openqa.selenium.WebElement airlineCheckbox = wait.until(org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath(dynamicXpath)));
+            WebElement airlineCheckbox = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(dynamicXpath)));
 
-            org.openqa.selenium.WebElement oldFirstTicket = driver.findElement(org.openqa.selenium.By.xpath("(//div[contains(@class, 'summary-marketing-airlines')])[1]"));
+            WebElement oldFirstTicket = driver.findElement(By.xpath("(//div[contains(@class, 'summary-marketing-airlines')])[1]"));
 
             scrollToElement(airlineCheckbox);
             clickElement(airlineCheckbox);
 
-            wait.until(org.openqa.selenium.support.ui.ExpectedConditions.stalenessOf(oldFirstTicket));
-            wait.until(org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("(//div[contains(@class, 'summary-marketing-airlines')])[1]")));
+            wait.until(ExpectedConditions.stalenessOf(oldFirstTicket));
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//div[contains(@class, 'summary-marketing-airlines')])[1]")));
 
         } catch (Exception e) {
-            System.out.println("Havayolu filtresi seçilirken hata: " + e.getMessage());
-            throw new RuntimeException("Filtre bulunamadı veya sayfa yenilenemedi!");
+            throw new RuntimeException("Havayolu filtresi (" + airlineName + ") seçilemedi: " + e.getMessage());
         }
     }
+
     public List<String> getAllAirlineNames() {
-        return airlineNames.stream()
-                .map(WebElement::getText)
-                .map(String::trim)
-                .toList();
+        return airlineNames.stream().map(WebElement::getText).map(String::trim).toList();
     }
 
     public List<Double> getAllFlightPrices() {
-        return flightPrices.stream()
-                .map(e -> Double.parseDouble(e.getAttribute("data-price")))
-                .toList();
+        return flightPrices.stream().map(e -> Double.parseDouble(e.getAttribute("data-price"))).toList();
+    }
+
+    public void selectFirstFlight() {
+        waitForVisibilityOfElement(firstFlightSelectButton);
+        scrollToElement(firstFlightSelectButton);
+        clickElement(firstFlightSelectButton);
     }
 }

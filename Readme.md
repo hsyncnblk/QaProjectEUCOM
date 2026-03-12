@@ -24,14 +24,25 @@ Proje sadece test koşmakla kalmaz, aynı zamanda çekilen veriler üzerinden de
 
 ---
 
-## 📸 Ekran Görüntüleri
-### Allure Test Raporu
-> ![Allure Report](https://github.com/hsyncnblk/QaProjectEUCOM/blob/main/allure_screenshot.png?raw=true)
-> *Test adımlarının ve hata anındaki ekran görüntülerinin merkezi raporu.*
-
----
-
 ## 🛠️ Projeyi Çalıştırma
 1. `mvn clean install`
 2. `mvn test`
 3. `mvn allure:serve`
+
+---
+
+# 📸 Ekran Görüntüleri
+
+### Allure Test Raporu - 1
+> ![Allure Report 1](photos/Ekran%20görüntüsü%202026-03-11%20190351.png)
+
+### Allure Test Raporu - 2
+> ![Allure Report 2](photos/Ekran%20görüntüsü%202026-03-11%20190401.png)
+
+### Test Otomasyon Sonuçları - 1
+> ![Test Result 1](photos/Ekran%20görüntüsü%202026-03-11%20222609.png)
+
+### Test Otomasyon Sonuçları - 2
+> ![Test Result 2](photos/Ekran%20görüntüsü%202026-03-11%20223344.png)
+
+
